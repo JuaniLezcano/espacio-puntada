@@ -1,8 +1,9 @@
-import type { Workshop } from "@/data/types/workshop";
+import type { Workshop } from "@/generated/prisma/client";
 import { Badge } from "@/components/ui/Badge";
 import { WhatsAppCTA } from "@/components/ui/WhatsAppCTA";
 import { InstagramCTA } from "@/components/ui/InstagramCTA";
 import { LightboxGallery } from "@/components/ui/LightboxGallery";
+import { BookingForm } from "@/components/workshops/BookingForm";
 import { siteConfig } from "@/data/site-config";
 import { formatDate } from "@/lib/format";
 
@@ -14,7 +15,6 @@ const statusBadge: Record<Workshop["status"], { label: string; tone: "success" |
 
 export function WorkshopDetail({ workshop }: { workshop: Workshop }) {
   const badge = statusBadge[workshop.status];
-  const reservation = workshop.reservation;
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
@@ -23,7 +23,7 @@ export function WorkshopDetail({ workshop }: { workshop: Workshop }) {
           layout="hero"
           images={[
             { src: workshop.coverImage, alt: workshop.title },
-            ...(workshop.gallery ?? []).map((src) => ({
+            ...workshop.gallery.map((src) => ({
               src,
               alt: `${workshop.title} - foto adicional`,
             })),
@@ -47,31 +47,31 @@ export function WorkshopDetail({ workshop }: { workshop: Workshop }) {
           <InfoRow
             label="Ubicación"
             value={
-              workshop.location.address
-                ? `${workshop.location.name} — ${workshop.location.address}`
-                : workshop.location.name
+              workshop.locationAddress
+                ? `${workshop.locationName} — ${workshop.locationAddress}`
+                : workshop.locationName
             }
           />
           <InfoRow
             label="Cupo"
-            value={
-              workshop.spotsLeft !== undefined
-                ? `${workshop.spotsLeft} de ${workshop.capacity} lugares disponibles`
-                : `${workshop.capacity} lugares`
-            }
+            value={`${workshop.spotsLeft} de ${workshop.capacity} lugares disponibles`}
           />
         </dl>
 
-        {workshop.status === "proximo" && reservation.type === "external" && (
+        {workshop.status === "proximo" && workshop.reservationType === "internal" && (
+          <BookingForm workshopSlug={workshop.slug} />
+        )}
+
+        {workshop.status === "proximo" && workshop.reservationType === "external" && (
           <div className="mt-6 flex flex-col gap-3">
             <WhatsAppCTA
               phone={siteConfig.social.whatsapp ?? ""}
-              message={reservation.whatsappMessage}
+              message={workshop.whatsappMessage ?? undefined}
               className="w-full"
             >
               Reservar por WhatsApp
             </WhatsAppCTA>
-            {reservation.instagramHandle && siteConfig.social.instagram && (
+            {workshop.instagramHandle && siteConfig.social.instagram && (
               <InstagramCTA href={siteConfig.social.instagram} className="w-full">
                 Consultar por Instagram
               </InstagramCTA>

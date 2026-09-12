@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Workshop } from "@/data/types/workshop";
+import type { Workshop } from "@/generated/prisma/client";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/format";
 

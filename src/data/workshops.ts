@@ -1,5 +1,8 @@
 import type { Workshop } from "./types/workshop";
 
+// La app ya no lee este archivo — los workshops viven en la base de datos
+// (ver prisma/schema.prisma). Se mantiene solo como fuente de datos inicial
+// para prisma/seed.ts.
 export const workshops: Workshop[] = [
   {
     slug: "workshop-vestido-de-lino",

@@ -34,7 +34,7 @@ export default async function StudentDetailPage({ params }: PageProps) {
 
   if (!student) notFound();
 
-  const related = getRelatedLabel(student.relatedTo);
+  const related = await getRelatedLabel(student.relatedTo);
 
   return (
     <Container className="py-16">

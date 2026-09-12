@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/data/site-config";
-import { workshops } from "@/data/workshops";
+import { prisma } from "@/lib/prisma";
 import { students } from "@/data/students";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const workshops = await prisma.workshop.findMany();
   const staticRoutes = [
     "",
     "/clases",

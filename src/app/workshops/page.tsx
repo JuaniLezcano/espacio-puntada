@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { workshops } from "@/data/workshops";
+import type { Workshop } from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WorkshopCard } from "@/components/workshops/WorkshopCard";
@@ -11,13 +12,14 @@ export const metadata: Metadata = buildMetadata({
   path: "/workshops",
 });
 
-const statusOrder: Record<(typeof workshops)[number]["status"], number> = {
+const statusOrder: Record<Workshop["status"], number> = {
   proximo: 0,
   agotado: 1,
   finalizado: 2,
 };
 
-export default function WorkshopsPage() {
+export default async function WorkshopsPage() {
+  const workshops = await prisma.workshop.findMany();
   const sorted = [...workshops].sort(
     (a, b) => statusOrder[a.status] - statusOrder[b.status]
   );

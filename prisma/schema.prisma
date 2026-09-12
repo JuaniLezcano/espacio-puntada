@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WorkshopStatus {
+  proximo
+  agotado
+  finalizado
+}
+
+// Hoy solo se usa "internal" (reserva propia con control de cupo). "external"
+// queda para el caso borde de un workshop que se maneje solo por WhatsApp,
+// sin pasar por el flujo de reserva.
+enum ReservationType {
+  internal
+  external
+}
+
+model Workshop {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  shortDescription String
+  description String
+
+  date        DateTime
+  dateLabel   String?
+  durationLabel String
+
+  locationName    String
+  locationAddress String?
+
+  capacity  Int
+  spotsLeft Int
+
+  coverImage String
+  gallery    String[]
+
+  reservationType    ReservationType @default(internal)
+  whatsappMessage    String?
+  instagramHandle    String?
+
+  featured Boolean        @default(false)
+  status   WorkshopStatus @default(proximo)
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookingStatus {
+  confirmed
+  cancelled
+}
+
+model Booking {
+  id    String  @id @default(cuid())
+  name  String
+  phone String
+  email String?
+
+  status BookingStatus @default(confirmed)
+
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+
+  createdAt DateTime @default(now())
+}

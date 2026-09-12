@@ -1,11 +1,12 @@
-import { workshops } from "@/data/workshops";
+import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { WorkshopCard } from "@/components/workshops/WorkshopCard";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function FeaturedWorkshops() {
+export async function FeaturedWorkshops() {
+  const workshops = await prisma.workshop.findMany();
   const featured = workshops.filter((w) => w.featured || w.status === "proximo");
 
   if (featured.length === 0) return null;

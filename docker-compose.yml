@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: espacio_puntada
+      POSTGRES_PASSWORD: espacio_puntada
+      POSTGRES_DB: espacio_puntada
+    ports:
+      - "5432:5432"
+    volumes:
+      - espacio_puntada_db:/var/lib/postgresql/data
+
+volumes:
+  espacio_puntada_db:
