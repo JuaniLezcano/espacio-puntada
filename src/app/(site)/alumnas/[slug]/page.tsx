@@ -11,6 +11,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return students.map((student) => ({ slug: student.slug }));
 }
