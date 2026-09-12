@@ -10,6 +10,14 @@ Antes de esto, el cupo de cada workshop (`spotsLeft`) era un número editado a m
 
 **Fuera de alcance de esta fase (a propósito):** pagos, señas, holds temporales de cupo, notificaciones por mail. El contacto post-reserva sigue siendo manual por WhatsApp ("te vamos a contactar para coordinar el pago"). Eso es la fase 2 (Mercado Pago, ver más abajo).
 
+## Panel de administración (`/admin/reservas`)
+
+Página mínima para ver, por workshop, quién reservó (nombre, teléfono, email, fecha) y cancelar una reserva — cancelar libera el cupo (`spotsLeft += 1`) y, si el workshop estaba `agotado`, lo vuelve a `proximo` automáticamente. Antes de esto, la única forma de ver las reservas era abrir `npm run db:studio`.
+
+Protegida con **HTTP Basic Auth** vía `src/middleware.ts`, gateada por la variable de entorno `ADMIN_PASSWORD` (acepta cualquier usuario, solo valida la contraseña). Si la variable no está seteada, la ruta devuelve `503` en vez de quedar abierta por defecto — así que en Railway hay que cargar `ADMIN_PASSWORD` como variable de entorno para que el panel funcione. La página además lleva `robots: noindex` y no está linkeada desde ningún menú.
+
+No es una solución de autenticación robusta (no hay usuarios, ni sesiones, ni rate limiting) — es proporcional a "una sola persona del negocio mirando esto ocasionalmente". Si el panel crece o lo usa más de una persona, conviene reemplazarlo por un login real.
+
 ## Stack
 
 - **Postgres** como base de datos.
@@ -65,6 +73,7 @@ Scripts nuevos en `package.json`:
 3. Build command: el `postinstall` ya corre `prisma generate` automáticamente durante `npm install`.
 4. Antes de que la app arranque (o como parte del deploy), correr `npm run db:deploy` para aplicar las migraciones contra la base de Railway. **No usar `db:migrate` en producción** — ese comando puede pedir confirmación interactiva y está pensado solo para desarrollo.
 5. Una vez con la base migrada, correr el seed manualmente una sola vez (`npm run db:seed`) para cargar los workshops reales — reemplazando antes el contenido de ejemplo en `data/workshops.ts` por los datos reales, o cargándolos directo con Prisma Studio.
+6. Cargar `ADMIN_PASSWORD` como variable de entorno del servicio (una contraseña propia, no la de desarrollo) — sin esto, `/admin/reservas` responde `503` en vez de quedar abierto.
 
 ## Roadmap — Fase 2: Mercado Pago
 
