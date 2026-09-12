@@ -8,6 +8,8 @@ import { WhatsAppCTA } from "@/components/ui/WhatsAppCTA";
 import { siteConfig } from "@/data/site-config";
 import { buildMetadata } from "@/lib/metadata";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = buildMetadata({
   title: "Clases",
   description: "Horarios disponibles para las clases regulares de costura en Estudio Puntada.",

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/format";
 import { cancelBooking } from "@/lib/actions/admin";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Reservas — Admin",
   robots: { index: false, follow: false },

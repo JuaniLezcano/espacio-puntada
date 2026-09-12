@@ -6,6 +6,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WorkshopCard } from "@/components/workshops/WorkshopCard";
 import { buildMetadata } from "@/lib/metadata";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = buildMetadata({
   title: "Workshops",
   description: "Próximos workshops de costura en Estudio Puntada: fechas, cupos y precios.",

@@ -3,6 +3,8 @@ import { siteConfig } from "@/data/site-config";
 import { prisma } from "@/lib/prisma";
 import { students } from "@/data/students";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const workshops = await prisma.workshop.findMany();
   const staticRoutes = [

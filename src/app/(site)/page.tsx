@@ -4,6 +4,8 @@ import { FeaturedWorkshops } from "@/components/home/FeaturedWorkshops";
 import { FeaturedStudents } from "@/components/home/FeaturedStudents";
 import { PinkedDivider } from "@/components/ui/PinkedDivider";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>
