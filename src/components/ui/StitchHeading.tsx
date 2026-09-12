@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   useTransform,
 } from "motion/react";
+import { useMounted } from "@/lib/useMounted";
 
 interface StitchHeadingProps {
   text: string;
@@ -19,6 +20,16 @@ interface StitchHeadingProps {
 const LETTER_DELAY = 0.035;
 const SPRING = { type: "spring" as const, stiffness: 420, damping: 26, mass: 0.6 };
 
+// Tiempo aproximado que tarda una letra en asentarse tras arrancar su
+// spring (con los parámetros de SPRING de arriba). Motion no expone una
+// duración exacta para un spring, así que este valor se ajusta a ojo en el
+// navegador si SPRING cambia. A partir de acá, la duración del sweep se
+// deriva de LETTER_DELAY y la cantidad real de letras — no de una fórmula
+// aparte que pueda desincronizarse en silencio.
+const SPRING_SETTLE_TIME = 0.45;
+const SWEEP_START_DELAY = 0.15;
+const MAX_SWEEP_DURATION = 2.4;
+
 /**
  * Título que se "borda" letra por letra cuando entra en pantalla: cada letra
  * hace un spring-in con blur, y una línea de puntada se dibuja debajo en
@@ -27,10 +38,15 @@ const SPRING = { type: "spring" as const, stiffness: 420, damping: 26, mass: 0.6
  */
 export function StitchHeading({ text, as = "h2", className }: StitchHeadingProps) {
   const Tag = as;
+  // La línea de puntada + aguja es la pieza de mayor impacto: se reserva
+  // para el h1 (una vez por página) para que siga siendo una sorpresa y no
+  // se repita como "ruido de fondo" en cada título de sección.
+  const showStitch = as === "h1";
   const clipId = useId();
   const ref = useRef<HTMLHeadingElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.4 });
   const prefersReducedMotion = useReducedMotion();
+  const mounted = useMounted();
 
   const progress = useMotionValue(0);
   const sweep = useTransform(progress, [0, 1], ["0%", "100%"]);
@@ -40,19 +56,38 @@ export function StitchHeading({ text, as = "h2", className }: StitchHeadingProps
   const totalLetters = text.replace(/\s/g, "").length;
   let letterIndex = 0;
 
+  const sweepDuration = Math.min(
+    Math.max(totalLetters - 1, 0) * LETTER_DELAY + SPRING_SETTLE_TIME,
+    MAX_SWEEP_DURATION
+  );
+
   useEffect(() => {
-    if (!inView || prefersReducedMotion) return;
-    const duration = Math.min(0.5 + totalLetters * 0.045, 2.4);
+    if (!showStitch || !inView || !mounted || prefersReducedMotion) return;
     const controls = animate(progress, 1, {
-      duration,
+      duration: sweepDuration,
       ease: [0.22, 1, 0.36, 1],
-      delay: 0.15,
+      delay: SWEEP_START_DELAY,
     });
     return () => controls.stop();
-  }, [inView, prefersReducedMotion, progress, totalLetters]);
+  }, [showStitch, inView, mounted, prefersReducedMotion, progress, sweepDuration]);
 
-  if (prefersReducedMotion) {
-    return <Tag className={className}>{text}</Tag>;
+  // `useReducedMotion()` devuelve `null` hasta que Motion puede leer
+  // `matchMedia` del lado del cliente. Tratamos "todavía no lo sabemos"
+  // (SSR / primer render) igual que "preferí menos movimiento": así el
+  // usuario con reduced-motion activado nunca ve la versión animada montar
+  // y desmontar (el flash que causaba tratar `null` como `false`).
+  if (!mounted || prefersReducedMotion) {
+    // `ref` va acá también: `useInView` arma su IntersectionObserver en un
+    // efecto que corre una sola vez y depende de que `ref.current` ya esté
+    // seteado en ese momento. Si el ref solo se adjuntara en la rama animada
+    // de abajo, para cuando `mounted` pasa a `true` el efecto de useInView
+    // ya corrió con `ref.current` en null y nunca vuelve a intentarlo — las
+    // letras quedarían en opacity:0 para siempre.
+    return (
+      <Tag ref={ref} className={className}>
+        {text}
+      </Tag>
+    );
   }
 
   // Cada palabra queda en su propio inline-block (para no partirla en un
@@ -88,41 +123,48 @@ export function StitchHeading({ text, as = "h2", className }: StitchHeadingProps
 
   return (
     <Tag ref={ref} aria-label={text} className={className}>
-      <span aria-hidden="true" className="relative inline-block pb-2.5">
+      <span
+        aria-hidden="true"
+        className={`relative inline-block ${showStitch ? "pb-2.5" : ""}`}
+      >
         {wordNodes}
 
-        <svg
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-2 w-full overflow-visible"
-          viewBox="0 0 100 8"
-          preserveAspectRatio="none"
-        >
-          <clipPath id={clipId}>
-            <motion.rect x="0" y="0" height="8" style={{ width: sweep }} />
-          </clipPath>
-          <line
-            x1="0"
-            y1="4"
-            x2="100"
-            y2="4"
-            className="stroke-primary"
-            strokeWidth={1.6}
-            strokeLinecap="round"
-            strokeDasharray="4 3.2"
-            clipPath={`url(#${clipId})`}
-          />
-        </svg>
+        {showStitch && (
+          <>
+            <svg
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-2 w-full overflow-visible"
+              viewBox="0 0 100 8"
+              preserveAspectRatio="none"
+            >
+              <clipPath id={clipId}>
+                <motion.rect x="0" y="0" height="8" style={{ width: sweep }} />
+              </clipPath>
+              <line
+                x1="0"
+                y1="4"
+                x2="100"
+                y2="4"
+                className="stroke-primary"
+                strokeWidth={1.6}
+                strokeLinecap="round"
+                strokeDasharray="4 3.2"
+                clipPath={`url(#${clipId})`}
+              />
+            </svg>
 
-        <motion.span
-          className="pointer-events-none absolute bottom-0 text-primary drop-shadow-sm"
-          style={{
-            left: sweep,
-            opacity: needleOpacity,
-            translateX: "-50%",
-            translateY: "30%",
-          }}
-        >
-          <NeedleGlyph />
-        </motion.span>
+            <motion.span
+              className="pointer-events-none absolute bottom-0 text-primary drop-shadow-sm"
+              style={{
+                left: sweep,
+                opacity: needleOpacity,
+                translateX: "-50%",
+                translateY: "30%",
+              }}
+            >
+              <NeedleGlyph />
+            </motion.span>
+          </>
+        )}
       </span>
     </Tag>
   );

@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { siteConfig } from "@/data/site-config";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/layout/Container";
 import { StitchHeading } from "@/components/ui/StitchHeading";
+import { SewingMachineAssembly } from "@/components/ui/SewingMachineAssembly";
 
 export function Hero() {
   return (
@@ -28,15 +28,8 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl">
-          <Image
-            src="/images/hero/hero-home.svg"
-            alt={siteConfig.name}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-          />
+        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl bg-background-alt p-10">
+          <SewingMachineAssembly className="h-full w-full max-w-sm" />
         </div>
       </Container>
     </section>

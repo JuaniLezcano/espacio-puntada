@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
+import { useMounted } from "@/lib/useMounted";
 
 export interface LightboxImage {
   src: string;
@@ -17,6 +19,7 @@ interface LightboxGalleryProps {
 
 export function LightboxGallery({ images, layout = "grid" }: LightboxGalleryProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const mounted = useMounted();
 
   if (images.length === 0) return null;
 
@@ -72,14 +75,18 @@ export function LightboxGallery({ images, layout = "grid" }: LightboxGalleryProp
         </div>
       )}
 
-      {openIndex !== null &&
+      {mounted &&
         createPortal(
-          <LightboxOverlay
-            images={images}
-            index={openIndex}
-            onClose={() => setOpenIndex(null)}
-            onIndexChange={setOpenIndex}
-          />,
+          <AnimatePresence>
+            {openIndex !== null && (
+              <LightboxOverlay
+                images={images}
+                index={openIndex}
+                onClose={() => setOpenIndex(null)}
+                onIndexChange={setOpenIndex}
+              />
+            )}
+          </AnimatePresence>,
           document.body
         )}
     </div>
@@ -116,7 +123,11 @@ function LightboxOverlay({
   const current = images[index];
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-foreground/90 p-4"
       onClick={onClose}
     >
@@ -147,7 +158,24 @@ function LightboxOverlay({
         className="relative aspect-[4/3] w-full max-w-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <Image src={current.src} alt={current.alt} fill sizes="100vw" className="object-contain" />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.src}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={current.src}
+              alt={current.alt}
+              fill
+              sizes="100vw"
+              className="object-contain"
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {current.caption && (
@@ -167,6 +195,6 @@ function LightboxOverlay({
           ›
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }
