@@ -1,11 +1,13 @@
-import { scheduleSlots } from "@/data/schedule";
+import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { WeeklySchedule } from "@/components/schedule/WeeklySchedule";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function RegularClasses() {
+export async function RegularClasses() {
+  const scheduleSlots = await prisma.scheduleSlot.findMany();
+
   return (
     <section className="py-16">
       <Reveal>

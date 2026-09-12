@@ -10,13 +10,23 @@ Antes de esto, el cupo de cada workshop (`spotsLeft`) era un número editado a m
 
 **Fuera de alcance de esta fase (a propósito):** pagos, señas, holds temporales de cupo, notificaciones por mail. El contacto post-reserva sigue siendo manual por WhatsApp ("te vamos a contactar para coordinar el pago"). Eso es la fase 2 (Mercado Pago, ver más abajo).
 
-## Panel de administración (`/admin/reservas`)
+## Panel de administración (`/admin`)
 
-Página mínima para ver, por workshop, quién reservó (nombre, teléfono, email, fecha) y cancelar una reserva — cancelar libera el cupo (`spotsLeft += 1`) y, si el workshop estaba `agotado`, lo vuelve a `proximo` automáticamente. Antes de esto, la única forma de ver las reservas era abrir `npm run db:studio`.
+Tres secciones, compartiendo nav en `src/app/admin/layout.tsx`:
 
-Protegida con **HTTP Basic Auth** vía `src/middleware.ts`, gateada por la variable de entorno `ADMIN_PASSWORD` (acepta cualquier usuario, solo valida la contraseña). Si la variable no está seteada, la ruta devuelve `503` en vez de quedar abierta por defecto — así que en Railway hay que cargar `ADMIN_PASSWORD` como variable de entorno para que el panel funcione. La página además lleva `robots: noindex` y no está linkeada desde ningún menú.
+- **`/admin/reservas`** — por workshop, quién reservó (nombre, teléfono, email, fecha) y botón para cancelar. Cancelar libera el cupo (`spotsLeft += 1`) y, si el workshop estaba `agotado`, lo vuelve a `proximo` automáticamente.
+- **`/admin/workshops`** — CRUD completo: listar, crear (`/admin/workshops/nuevo`), editar y borrar workshops. Borrar está bloqueado si el workshop tiene reservas **confirmadas** (hay que cancelarlas primero desde `/admin/reservas`); si solo tiene reservas ya canceladas, se borran junto con el workshop al eliminarlo.
+- **`/admin/horarios`** — CRUD del horario semanal de clases regulares (día, horario, nota). Reemplaza la edición manual de `data/schedule.ts`.
 
-No es una solución de autenticación robusta (no hay usuarios, ni sesiones, ni rate limiting) — es proporcional a "una sola persona del negocio mirando esto ocasionalmente". Si el panel crece o lo usa más de una persona, conviene reemplazarlo por un login real.
+Antes de esto, la única forma de tocar estos datos era editar código y redeployar, o usar `npm run db:studio`.
+
+Los campos de imagen (portada, galería) son inputs de texto con la ruta/URL — no hay subida de archivos todavía. Para agregar fotos reales hay que subirlas a `public/images/...` (o a un host externo) y pegar la ruta/URL en el formulario.
+
+Protegido con **HTTP Basic Auth** vía `src/proxy.ts` (el archivo se llama así, no `middleware.ts` — Next.js 16 renombró la convención, ver nota más abajo), gateado por la variable de entorno `ADMIN_PASSWORD` (acepta cualquier usuario, solo valida la contraseña) y aplicado a todo `/admin/:path*`. Si la variable no está seteada, la ruta devuelve `503` en vez de quedar abierta por defecto — así que en Railway hay que cargar `ADMIN_PASSWORD` como variable de entorno para que el panel funcione. Todas las páginas del panel llevan `robots: noindex` y no están linkeadas desde ningún menú público.
+
+No es una solución de autenticación robusta (no hay usuarios, ni sesiones, ni rate limiting) — es proporcional a "una sola persona del negocio administrando esto". Si el panel crece o lo usa más de una persona, conviene reemplazarlo por un login real.
+
+> Nota de versión: en Next.js 16 la convención `middleware.ts` está deprecada a favor de `proxy.ts` (mismo propósito, función exportada `proxy` en vez de `middleware`). El proyecto ya usa el nombre nuevo.
 
 ## Stack
 
@@ -30,8 +40,9 @@ No es una solución de autenticación robusta (no hay usuarios, ni sesiones, ni 
 
 - **`Workshop`** — el mismo contenido que antes vivía en `workshops.ts` (título, fechas, ubicación, galería, etc.) más `capacity` y `spotsLeft` como columnas reales. Se agregó `reservationType` (`internal` | `external`) para no perder la distinción que ya existía en el código: hoy todos los workshops usan `internal` (este flujo nuevo), pero queda la puerta abierta a un workshop puntual que se maneje solo por WhatsApp sin pasar por el formulario.
 - **`Booking`** — una fila por reserva: `name`, `phone` (obligatorios — todo el negocio se maneja por WhatsApp), `email` (opcional), `status` (`confirmed` | `cancelled`), y la relación al `Workshop`.
+- **`ScheduleSlot`** — un slot del horario semanal de clases regulares: `day`, `time`, `note` (opcional). Sin cupo ni reservas — es solo el horario que se muestra en `/clases`, no una clase reservable.
 
-`src/data/workshops.ts` y su tipo (`src/data/types/workshop.ts`) ya no los lee la app — se dejaron solo como fuente de datos inicial para el seed (`prisma/seed.ts`).
+`src/data/workshops.ts` y `src/data/schedule.ts` (y sus tipos en `src/data/types/`) ya no los lee la app — se dejaron solo como fuente de datos inicial para el seed (`prisma/seed.ts`). `src/data/class-info.ts` (los textos "las clases incluyen" / "condiciones" de `/clases`) sí lo sigue leyendo la app — queda fuera de la base de datos por ahora, es contenido estático.
 
 ## Cómo funciona el control de cupo (la parte importante)
 

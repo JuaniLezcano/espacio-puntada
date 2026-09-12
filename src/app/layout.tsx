@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { playfairDisplay, inter } from "@/fonts";
 import { siteConfig } from "@/data/site-config";
 import { buildMetadata } from "@/lib/metadata";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { WhatsAppFAB } from "@/components/ui/WhatsAppFAB";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,18 +16,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Header/Footer/WhatsAppFAB del sitio público viven en (site)/layout.tsx,
+// no acá — así /admin no los hereda (es una herramienta interna, no una
+// página más del sitio).
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="es"
       className={`${playfairDisplay.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <WhatsAppFAB />
-      </body>
+      <body className="min-h-full font-body">{children}</body>
     </html>
   );
 }

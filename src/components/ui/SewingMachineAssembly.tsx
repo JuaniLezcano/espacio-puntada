@@ -29,14 +29,24 @@ const ARM = {
   right: "3.681,-1.125 2.382,-0.375 2.382,-1.375 3.681,-2.125",
   front: "-1.516,-2.625 2.382,-0.375 2.382,-1.375 -1.516,-3.625",
 };
-// Aguja: fija en x=3.031, largo rígido de NEEDLE_HOUSING_Y a NEEDLE_TIP_Y en
-// reposo. Sube/baja trasladando el grupo entero (`y` -> transform, va por
-// compositor) en vez de estirar el atributo `y2` (forzaría relayout de SVG
-// en cada frame de un loop infinito).
-const NEEDLE_X = 3.031;
-const NEEDLE_HOUSING_Y = -0.75;
-const NEEDLE_TIP_Y = 0.85;
-const NEEDLE_TRAVEL = 1.4;
+// Aguja: anclada en (NEEDLE_X, NEEDLE_HOUSING_Y) = el vértice
+// frontal-inferior-derecho del brazo (mismo punto que la cara "front" y
+// "right" del ARM comparten en ese lado), para que cuelgue justo de la
+// esquina visible en vez de un punto sobre la arista lateral que retrocede
+// en diagonal (eso la hacía verse flotando, ligeramente separada del
+// brazo). Sube/baja animando `scaleY` con el origen de transformación ahí
+// (style.originY: 0) en vez de estirar el atributo `y2` — un scale por
+// transform va por compositor igual que un translate (sin relayout de SVG
+// en cada frame del loop infinito), pero a diferencia de trasladar el
+// segmento entero, la punta sigue creciendo desde un punto fijo arriba en
+// vez de deslizarse completa (eso la hacía verse como un palito corto y
+// suelto en vez de una aguja).
+const NEEDLE_X = 2.382;
+const NEEDLE_HOUSING_Y = -0.375;
+const NEEDLE_UP_Y = 0.625;
+const NEEDLE_DOWN_Y = 2.625;
+const NEEDLE_SCALE_DOWN =
+  (NEEDLE_DOWN_Y - NEEDLE_HOUSING_Y) / (NEEDLE_UP_Y - NEEDLE_HOUSING_Y);
 
 function IsoBox({
   faces,
@@ -128,31 +138,30 @@ export function SewingMachineAssembly({ className }: SewingMachineAssemblyProps)
         <ScrewHole cx={0.866} cy={-3} />
       </motion.g>
 
-      {/* Aguja: largo fijo, se traslada en vez de estirarse (ver comentario
-          en NEEDLE_TRAVEL) — animación de `y` = transform, no relayout. */}
-      <motion.g
-        initial={{ y: 0, opacity: 0 }}
+      {/* Aguja: `y1` fijo en la carcasa, `scaleY` con origen ahí mismo (ver
+          comentario en NEEDLE_SCALE_DOWN) — animación por transform, no
+          relayout, pero la punta crece desde un punto fijo arriba. */}
+      <motion.line
+        x1={NEEDLE_X}
+        x2={NEEDLE_X}
+        y1={NEEDLE_HOUSING_Y}
+        y2={NEEDLE_UP_Y}
+        stroke="currentColor"
+        strokeWidth={STROKE * 1.3}
+        strokeLinecap="round"
+        style={{ originY: 0 }}
+        initial={{ scaleY: 1, opacity: 0 }}
         animate={{
-          y: needleActive ? [0, NEEDLE_TRAVEL, 0] : 0,
+          scaleY: needleActive ? [1, NEEDLE_SCALE_DOWN, 1] : 1,
           opacity: assembled || reduceMotion ? 1 : 0,
         }}
         transition={{
-          y: needleActive
+          scaleY: needleActive
             ? { duration: 0.7, repeat: Infinity, ease: "easeInOut" }
             : { duration: 0.18 },
           opacity: { duration: reduceMotion ? 0 : 0.18 },
         }}
-      >
-        <line
-          x1={NEEDLE_X}
-          x2={NEEDLE_X}
-          y1={NEEDLE_HOUSING_Y}
-          y2={NEEDLE_TIP_Y}
-          stroke="currentColor"
-          strokeWidth={STROKE * 1.3}
-          strokeLinecap="round"
-        />
-      </motion.g>
+      />
     </svg>
   );
 }

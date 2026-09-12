@@ -36,15 +36,15 @@ Además hay un botón flotante de WhatsApp (`WhatsAppFAB`) visible en todo el si
 
 ## Contenido y cómo se administra
 
-Mixto: los **workshops** viven en una base de datos Postgres (vía Prisma — ver `docs/reservas.md`); todo lo demás sigue siendo **código estático** editado a mano en `src/data/`:
+Mixto: **workshops** y **horario semanal de clases** viven en una base de datos Postgres (vía Prisma — ver `docs/reservas.md`) y se gestionan desde `/admin` (panel con autenticación básica); todo lo demás sigue siendo **código estático** editado a mano en `src/data/`:
 
 - `site-config.ts` — nombre, tagline, dirección, WhatsApp e Instagram del negocio.
-- `schedule.ts` / `class-info.ts` — horarios de clases regulares, qué incluyen, condiciones.
+- `class-info.ts` — qué incluyen las clases y condiciones (textos de `/clases`).
 - `students.ts` — cada alumna: fotos, proyecto, testimonio, y a qué clase o workshop está relacionada (para el link "Tomó: ...").
 
-`workshops.ts` ya no lo lee la app — se mantiene solo como fuente de datos inicial para el seed de la base (`prisma/seed.ts`).
+`workshops.ts` y `schedule.ts` ya no los lee la app — se mantienen solo como fuente de datos inicial para el seed de la base (`prisma/seed.ts`).
 
-Cambiar un horario o sumar una alumna a la galería todavía implica editar estos archivos TypeScript y volver a desplegar. Agregar o modificar un workshop, en cambio, ya no requiere deploy — se hace directo contra la base (por ahora con `npm run db:studio`; no hay panel de administración todavía).
+Sumar una alumna a la galería o cambiar los textos de `/clases` todavía implica editar código y volver a desplegar. Agregar/editar/borrar un workshop u horario, en cambio, se hace directo desde `/admin` (`/admin/workshops`, `/admin/horarios`), sin deploy.
 
 ### Imágenes
 

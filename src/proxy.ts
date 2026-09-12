@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const password = process.env.ADMIN_PASSWORD;
 
   // Sin la variable configurada, no exponemos el panel en absoluto en vez de

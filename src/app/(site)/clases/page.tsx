@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { scheduleSlots } from "@/data/schedule";
+import { prisma } from "@/lib/prisma";
 import { classIncludes, classConditions } from "@/data/class-info";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -14,7 +14,9 @@ export const metadata: Metadata = buildMetadata({
   path: "/clases",
 });
 
-export default function ClasesPage() {
+export default async function ClasesPage() {
+  const scheduleSlots = await prisma.scheduleSlot.findMany();
+
   return (
     <Container className="py-16">
       <SectionHeading

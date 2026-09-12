@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { workshops } from "../src/data/workshops";
+import { scheduleSlots } from "../src/data/schedule";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
@@ -34,6 +35,16 @@ async function main() {
   }
 
   console.log(`Seed OK: ${workshops.length} workshops migrados.`);
+
+  // Sin clave natural para hacer upsert — solo cargamos los horarios
+  // iniciales si la tabla todavía está vacía.
+  const existingSlots = await prisma.scheduleSlot.count();
+  if (existingSlots === 0) {
+    await prisma.scheduleSlot.createMany({ data: scheduleSlots });
+    console.log(`Seed OK: ${scheduleSlots.length} horarios migrados.`);
+  } else {
+    console.log("Horarios: ya hay datos, no se vuelve a sembrar.");
+  }
 }
 
 main()

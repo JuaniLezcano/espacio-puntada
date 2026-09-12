@@ -1,4 +1,4 @@
-import type { ScheduleSlot } from "@/data/types/schedule";
+import type { ScheduleSlot } from "@/generated/prisma/client";
 import { siteConfig } from "@/data/site-config";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 
