@@ -52,12 +52,13 @@ Las imágenes reales de alumnas y workshops todavía no existen: `public/images/
 
 - Reemplazar los SVG placeholder por fotos reales (jpg/png/webp).
 - Reemplazar `defaultOgImage` (usado como preview al compartir el link) por una imagen real de 1200x630 — varios clientes de mensajería no renderizan bien SVG como preview.
-- Completar la dirección y el número de WhatsApp reales en `site-config.ts` (hoy son datos de ejemplo).
+
+La dirección y el WhatsApp en `site-config.ts` ya son los reales del negocio: WhatsApp `+54 9 2213 04-3410`, y dirección por zona ("Zona Plaza Belgrano, La Plata, Buenos Aires" — no hay una dirección exacta, así que `mapsUrl` es una búsqueda de la zona en vez de un pin puntual). Los dos workshops de ejemplo cargados en la base también usan esta dirección real.
 
 ## Stack técnico (resumen funcional)
 
-- **Next.js 16 (App Router)** — cada carpeta bajo `src/app` es una ruta; `generateStaticParams` pre-genera las páginas de detalle de cada workshop y alumna en build time.
+- **Next.js 16 (App Router)** — cada carpeta bajo `src/app` es una ruta. Las páginas públicas viven bajo el route group `src/app/(site)/` (comparten `Header`/`Footer`/`WhatsAppFAB` vía ese layout); `/admin` queda fuera de ese grupo a propósito, así no hereda el header ni el botón de WhatsApp del sitio — ver `docs/reservas.md`. `generateStaticParams` pre-genera las páginas de detalle de cada alumna en build time; las de workshop son dinámicas contra la base (sin params estáticos), para que un workshop nuevo aparezca sin rebuild.
 - **Metadata dinámica** (`src/lib/metadata.ts`) — cada página arma su propio `<title>`, descripción e imagen de preview según el contenido (ej. el detalle de un workshop usa su propia portada como OG image).
 - **Tailwind CSS v4** para estilos, con paleta cálida (`background`, `background-alt`, `primary`) pensada para transmitir cercanía/artesanía.
 - **`motion`** para animaciones (reemplaza al viejo componente `Reveal` de scroll-reveal).
-- **Postgres + Prisma** para el modelo de reservas (fase 1 — ver `docs/reservas.md`). Sin autenticación ni panel de administración todavía.
+- **Postgres + Prisma** para el modelo de reservas y el panel `/admin` con autenticación básica (fase 1 — ver `docs/reservas.md`).

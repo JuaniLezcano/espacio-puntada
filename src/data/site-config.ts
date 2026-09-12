@@ -9,12 +9,13 @@ export const siteConfig = {
   url: "https://estudiopuntada.vercel.app",
   social: {
     instagram: "https://instagram.com/estudiopuntada",
-    whatsapp: "5491122334455",
+    whatsapp: "5492213043410",
   } satisfies SocialLinks,
   address: {
-    street: "Ejemplo 1234",
-    city: "Buenos Aires, Argentina",
-    mapsUrl: "https://maps.google.com/?q=Ejemplo+1234+Buenos+Aires",
+    street: "Zona Plaza Belgrano",
+    city: "La Plata, Buenos Aires, Argentina",
+    mapsUrl:
+      "https://maps.google.com/?q=Plaza+Belgrano,+La+Plata,+Buenos+Aires,+Argentina",
   } satisfies Address,
   // Placeholder — reemplazar por una imagen real (1200x630, jpg/png) antes de publicar,
   // ya que algunos clientes de mensajería no renderizan bien SVG como preview.

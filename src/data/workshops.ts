@@ -16,7 +16,7 @@ export const workshops: Workshop[] = [
     durationLabel: "6 horas (10:00 a 16:00hs, con pausa para almorzar)",
     location: {
       name: "Estudio Puntada",
-      address: "Ejemplo 1234, Buenos Aires",
+      address: "Zona Plaza Belgrano, La Plata, Buenos Aires",
     },
     capacity: 8,
     spotsLeft: 3,
@@ -44,7 +44,7 @@ export const workshops: Workshop[] = [
     durationLabel: "3 horas",
     location: {
       name: "Estudio Puntada",
-      address: "Ejemplo 1234, Buenos Aires",
+      address: "Zona Plaza Belgrano, La Plata, Buenos Aires",
     },
     capacity: 10,
     spotsLeft: 0,

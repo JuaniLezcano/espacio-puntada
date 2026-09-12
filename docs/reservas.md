@@ -1,5 +1,7 @@
 # Sistema de reservas propio — Fase 1
 
+**Estado: completa y probada en desarrollo local. Todavía no deployada a Railway.** Ver la sección "Deploy en Railway" más abajo para los pasos pendientes. Fase 2 (Mercado Pago) no empezada.
+
 ## Qué resuelve
 
 Antes de esto, el cupo de cada workshop (`spotsLeft`) era un número editado a mano en `src/data/workshops.ts`, y la reserva en sí pasaba 100% por WhatsApp (sin registro, sin control real de sobreventa). Esta fase reemplaza eso por:
@@ -12,13 +14,15 @@ Antes de esto, el cupo de cada workshop (`spotsLeft`) era un número editado a m
 
 ## Panel de administración (`/admin`)
 
-Tres secciones, compartiendo nav en `src/app/admin/layout.tsx`:
+`/admin` es una página índice (tarjetas con contador a cada sección); las tres secciones comparten nav en `src/app/admin/layout.tsx`:
 
 - **`/admin/reservas`** — por workshop, quién reservó (nombre, teléfono, email, fecha) y botón para cancelar. Cancelar libera el cupo (`spotsLeft += 1`) y, si el workshop estaba `agotado`, lo vuelve a `proximo` automáticamente.
 - **`/admin/workshops`** — CRUD completo: listar, crear (`/admin/workshops/nuevo`), editar y borrar workshops. Borrar está bloqueado si el workshop tiene reservas **confirmadas** (hay que cancelarlas primero desde `/admin/reservas`); si solo tiene reservas ya canceladas, se borran junto con el workshop al eliminarlo.
 - **`/admin/horarios`** — CRUD del horario semanal de clases regulares (día, horario, nota). Reemplaza la edición manual de `data/schedule.ts`.
 
 Antes de esto, la única forma de tocar estos datos era editar código y redeployar, o usar `npm run db:studio`.
+
+`/admin` está fuera del route group `(site)` (`src/app/(site)/`) donde viven las páginas públicas — a propósito, para no heredar el `Header`, `Footer` ni el `WhatsAppFAB` del sitio. El layout raíz (`src/app/layout.tsx`) quedó mínimo (solo `<html>/<body>` + fuentes); el header público vive en `src/app/(site)/layout.tsx`.
 
 Los campos de imagen (portada, galería) son inputs de texto con la ruta/URL — no hay subida de archivos todavía. Para agregar fotos reales hay que subirlas a `public/images/...` (o a un host externo) y pegar la ruta/URL en el formulario.
 
@@ -53,6 +57,8 @@ No es una solución de autenticación robusta (no hay usuarios, ni sesiones, ni 
 3. Si afectó una fila, se crea el `Booking` y, si `spotsLeft` llegó a 0, el `status` del workshop pasa a `agotado` — todo en la misma transacción.
 
 Esto se probó en este entorno de desarrollo simulando dos reservas simultáneas contra el mismo cupo de 1 lugar: una se confirmó, la otra fue rechazada con el mensaje de "se agotaron los lugares", y `spotsLeft` nunca quedó en negativo.
+
+`src/lib/actions/admin.ts` — `cancelBooking()` usa el mismo patrón (`UPDATE "Booking" SET status = 'cancelled' WHERE id = ? AND status = 'confirmed'`, chequeando filas afectadas antes de sumar el cupo). La primera versión no tenía esta protección — hacía "leer estado, si no está cancelada, actualizar" en pasos separados, así que un doble clic en "Cancelar" podía sumar el cupo dos veces para una sola reserva. Se corrigió y se probó disparando dos cancelaciones simultáneas de la misma reserva: solo suma el cupo una vez.
 
 La revalidación (`revalidatePath`) invalida el cache de `/workshops` y `/workshops/[slug]` apenas se confirma una reserva, así que el cupo se ve actualizado sin esperar ningún rebuild ni tiempo de expiración.
 
