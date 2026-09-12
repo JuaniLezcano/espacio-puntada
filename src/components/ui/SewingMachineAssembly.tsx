@@ -8,7 +8,7 @@ interface SewingMachineAssemblyProps {
 }
 
 const STROKE = 0.09;
-const SPRING = { type: "spring" as const, stiffness: 170, damping: 16, mass: 0.9 };
+const SPRING = { type: "spring" as const, stiffness: 210, damping: 20, mass: 0.8 };
 
 // Puntos generados por proyección isométrica de 3 volúmenes (base, columna,
 // brazo) — ver script de generación en el historial de la tarea. No son
@@ -29,12 +29,14 @@ const ARM = {
   right: "3.681,-1.125 2.382,-0.375 2.382,-1.375 3.681,-2.125",
   front: "-1.516,-2.625 2.382,-0.375 2.382,-1.375 -1.516,-3.625",
 };
-// Aguja: fija en x=3.031; "y1" es el punto donde cuelga del brazo,
-// "y2" es la punta, que sube y baja entre 0.25 (retraída) y 2.25 (clavada).
+// Aguja: fija en x=3.031, largo rígido de NEEDLE_HOUSING_Y a NEEDLE_TIP_Y en
+// reposo. Sube/baja trasladando el grupo entero (`y` -> transform, va por
+// compositor) en vez de estirar el atributo `y2` (forzaría relayout de SVG
+// en cada frame de un loop infinito).
 const NEEDLE_X = 3.031;
 const NEEDLE_HOUSING_Y = -0.75;
-const NEEDLE_UP_Y = 0.25;
-const NEEDLE_DOWN_Y = 2.25;
+const NEEDLE_TIP_Y = 0.85;
+const NEEDLE_TRAVEL = 1.4;
 
 function IsoBox({
   faces,
@@ -69,7 +71,13 @@ function ScrewHole({ cx, cy }: { cx: number; cy: number }) {
 
 export function SewingMachineAssembly({ className }: SewingMachineAssemblyProps) {
   const ref = useRef<SVGSVGElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.4 });
+  // Dos observers con distinto propósito: `hasEntered` es "once" (se pega
+  // en true la primera vez, para no repetir el ensamble); `inView` es en
+  // vivo, para pausar/reanudar el loop de la aguja según visibilidad actual
+  // en vez de dejarlo corriendo para siempre en segundo plano.
+  const hasEntered = useInView(ref, { once: true, amount: 0.4 });
+  const inView = useInView(ref, { amount: 0.4 });
+
   const prefersReducedMotion = useReducedMotion();
   const [assembled, setAssembled] = useState(false);
 
@@ -78,7 +86,8 @@ export function SewingMachineAssembly({ className }: SewingMachineAssemblyProps)
   const reduceMotion = prefersReducedMotion !== false;
 
   const settle = reduceMotion ? { duration: 0 } : undefined;
-  const show = reduceMotion || inView;
+  const show = reduceMotion || hasEntered;
+  const needleActive = assembled && inView && !reduceMotion;
 
   return (
     <svg
@@ -103,7 +112,7 @@ export function SewingMachineAssembly({ className }: SewingMachineAssemblyProps)
       <motion.g
         initial={{ opacity: 0, y: -2.5 }}
         animate={show ? { opacity: 1, y: 0 } : undefined}
-        transition={settle ?? { ...SPRING, delay: 0.25 }}
+        transition={settle ?? { ...SPRING, delay: 0.18 }}
       >
         <IsoBox faces={PILLAR} opacityScale={1.1} />
       </motion.g>
@@ -112,46 +121,38 @@ export function SewingMachineAssembly({ className }: SewingMachineAssemblyProps)
       <motion.g
         initial={{ opacity: 0, x: -1.8, y: -1.2 }}
         animate={show ? { opacity: 1, x: 0, y: 0 } : undefined}
-        transition={settle ?? { ...SPRING, delay: 0.55 }}
+        transition={settle ?? { ...SPRING, delay: 0.38 }}
         onAnimationComplete={() => setAssembled(true)}
       >
         <IsoBox faces={ARM} opacityScale={1.15} />
         <ScrewHole cx={0.866} cy={-3} />
       </motion.g>
 
-      {/* Aguja */}
-      <motion.line
-        x1={NEEDLE_X}
-        x2={NEEDLE_X}
-        y1={NEEDLE_HOUSING_Y}
-        stroke="currentColor"
-        strokeWidth={STROKE * 1.3}
-        strokeLinecap="round"
-        initial={{ y2: NEEDLE_HOUSING_Y, opacity: 0 }}
-        animate={
-          reduceMotion
-            ? { y2: NEEDLE_UP_Y, opacity: show ? 1 : 0 }
-            : assembled
-              ? {
-                  y2: [NEEDLE_UP_Y, NEEDLE_DOWN_Y, NEEDLE_UP_Y],
-                  opacity: 1,
-                }
-              : { y2: NEEDLE_HOUSING_Y, opacity: 0 }
-        }
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : assembled
-              ? {
-                  // Transición por propiedad: si `opacity` comparte la
-                  // transición de `y2`, hereda su `repeat: Infinity` y
-                  // termina parpadeando en loop en vez de quedar fija en 1.
-                  y2: { duration: 0.7, repeat: Infinity, ease: "easeInOut" },
-                  opacity: { duration: 0.2 },
-                }
-              : { duration: 0.2 }
-        }
-      />
+      {/* Aguja: largo fijo, se traslada en vez de estirarse (ver comentario
+          en NEEDLE_TRAVEL) — animación de `y` = transform, no relayout. */}
+      <motion.g
+        initial={{ y: 0, opacity: 0 }}
+        animate={{
+          y: needleActive ? [0, NEEDLE_TRAVEL, 0] : 0,
+          opacity: assembled || reduceMotion ? 1 : 0,
+        }}
+        transition={{
+          y: needleActive
+            ? { duration: 0.7, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0.18 },
+          opacity: { duration: reduceMotion ? 0 : 0.18 },
+        }}
+      >
+        <line
+          x1={NEEDLE_X}
+          x2={NEEDLE_X}
+          y1={NEEDLE_HOUSING_Y}
+          y2={NEEDLE_TIP_Y}
+          stroke="currentColor"
+          strokeWidth={STROKE * 1.3}
+          strokeLinecap="round"
+        />
+      </motion.g>
     </svg>
   );
 }

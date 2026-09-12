@@ -17,8 +17,8 @@ interface StitchHeadingProps {
   className?: string;
 }
 
-const LETTER_DELAY = 0.035;
-const SPRING = { type: "spring" as const, stiffness: 420, damping: 26, mass: 0.6 };
+const LETTER_DELAY = 0.028;
+const SPRING = { type: "spring" as const, stiffness: 480, damping: 28, mass: 0.55 };
 
 // Tiempo aproximado que tarda una letra en asentarse tras arrancar su
 // spring (con los parámetros de SPRING de arriba). Motion no expone una
@@ -26,8 +26,8 @@ const SPRING = { type: "spring" as const, stiffness: 420, damping: 26, mass: 0.6
 // navegador si SPRING cambia. A partir de acá, la duración del sweep se
 // deriva de LETTER_DELAY y la cantidad real de letras — no de una fórmula
 // aparte que pueda desincronizarse en silencio.
-const SPRING_SETTLE_TIME = 0.45;
-const SWEEP_START_DELAY = 0.15;
+const SPRING_SETTLE_TIME = 0.35;
+const SWEEP_START_DELAY = 0.12;
 const MAX_SWEEP_DURATION = 2.4;
 
 /**
