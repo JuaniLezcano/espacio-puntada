@@ -49,7 +49,7 @@ export default function ContactoPage() {
           <div className="flex flex-col gap-3">
             <WhatsAppCTA
               phone={siteConfig.social.whatsapp ?? ""}
-              message="Hola! Quiero hacer una consulta a Espacio Puntada."
+              message="Hola! Quiero hacer una consulta a Estudio Puntada."
             >
               Escribinos por WhatsApp
             </WhatsAppCTA>

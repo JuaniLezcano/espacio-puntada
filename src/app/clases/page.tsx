@@ -10,7 +10,7 @@ import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   title: "Clases",
-  description: "Horarios disponibles para las clases regulares de costura en Espacio Puntada.",
+  description: "Horarios disponibles para las clases regulares de costura en Estudio Puntada.",
   path: "/clases",
 });
 
@@ -62,7 +62,7 @@ export default function ClasesPage() {
         <div className="mt-4 flex justify-center">
           <WhatsAppCTA
             phone={siteConfig.social.whatsapp ?? ""}
-            message="Hola! Quiero consultar por los horarios de clases de Espacio Puntada."
+            message="Hola! Quiero consultar por los horarios de clases de Estudio Puntada."
           >
             Consultar por WhatsApp
           </WhatsAppCTA>

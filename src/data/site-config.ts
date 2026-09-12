@@ -1,13 +1,14 @@
 import type { SocialLinks, Address } from "./types/common";
 
 export const siteConfig = {
-  name: "Espacio Puntada",
+  name: "Estudio Puntada",
   tagline: "Un lugar para aprender a coser, a tu ritmo",
+  categoryTagline: "Clases de costura y moldería",
   description:
-    "Espacio de costura con clases regulares y workshops. Sumate a aprender a coser en un ambiente cálido y cercano.",
-  url: "https://espaciopuntada.vercel.app",
+    "Clases de costura y moldería con encuentros regulares y workshops. Sumate a aprender a coser en un ambiente cálido y cercano.",
+  url: "https://estudiopuntada.vercel.app",
   social: {
-    instagram: "https://instagram.com/espaciopuntada",
+    instagram: "https://instagram.com/estudiopuntada",
     whatsapp: "5491122334455",
   } satisfies SocialLinks,
   address: {

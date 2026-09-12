@@ -12,7 +12,7 @@ export const workshops: Workshop[] = [
     dateLabel: "Sábado 18 de octubre",
     durationLabel: "6 horas (10:00 a 16:00hs, con pausa para almorzar)",
     location: {
-      name: "Espacio Puntada",
+      name: "Estudio Puntada",
       address: "Ejemplo 1234, Buenos Aires",
     },
     capacity: 8,
@@ -40,7 +40,7 @@ export const workshops: Workshop[] = [
     dateLabel: "Sábado 14 de junio",
     durationLabel: "3 horas",
     location: {
-      name: "Espacio Puntada",
+      name: "Estudio Puntada",
       address: "Ejemplo 1234, Buenos Aires",
     },
     capacity: 10,

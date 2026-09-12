@@ -9,7 +9,7 @@ export function WhatsAppFAB() {
     <a
       href={buildWhatsAppLink(
         siteConfig.social.whatsapp,
-        "Hola! Quiero consultar sobre Espacio Puntada."
+        "Hola! Quiero consultar sobre Estudio Puntada."
       )}
       target="_blank"
       rel="noopener noreferrer"

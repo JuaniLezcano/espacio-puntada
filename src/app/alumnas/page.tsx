@@ -7,7 +7,7 @@ import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   title: "Alumnas",
-  description: "Descubrí los proyectos que hicieron nuestras alumnas en Espacio Puntada.",
+  description: "Descubrí los proyectos que hicieron nuestras alumnas en Estudio Puntada.",
   path: "/alumnas",
 });
 

@@ -7,7 +7,7 @@ import { buildMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildMetadata({
   title: "Workshops",
-  description: "Próximos workshops de costura en Espacio Puntada: fechas, cupos y precios.",
+  description: "Próximos workshops de costura en Estudio Puntada: fechas, cupos y precios.",
   path: "/workshops",
 });
 

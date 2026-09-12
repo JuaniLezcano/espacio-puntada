@@ -3,13 +3,16 @@ import { dirname, join } from "node:path";
 
 const root = join(import.meta.dirname, "..", "public", "images");
 
-const colors = ["#ded3c4", "#e8c4a0", "#d9cfc0", "#c1603f", "#8a7b5c"];
+// Deliberadamente distintos de --background (#e8e1d8) y --background-alt
+// (#ded3c4): si un placeholder usa un tono muy cercano al fondo de su propia
+// sección, la imagen queda "camuflada" e invisible aunque cargue bien.
+const colors = ["#c1603f", "#a64f32", "#e8c4a0", "#8a7b5c", "#6b5f55"];
 
 function svg(label, colorIndex) {
   const bg = colors[colorIndex % colors.length];
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
   <rect width="1200" height="900" fill="${bg}" />
-  <text x="600" y="450" font-family="sans-serif" font-size="42" fill="#2b2420" text-anchor="middle" dominant-baseline="middle">${label}</text>
+  <text x="600" y="450" font-family="sans-serif" font-size="42" fill="#faf6f1" text-anchor="middle" dominant-baseline="middle">${label}</text>
 </svg>
 `;
 }
@@ -32,8 +35,8 @@ const files = [
   ["alumnas/sol-martinez/portada.svg", "Sol Martínez"],
   ["alumnas/sol-martinez/foto-1.svg", "Sol - foto 1"],
 
-  ["hero/hero-home.svg", "Espacio Puntada"],
-  ["og/default-og.svg", "Espacio Puntada"],
+  ["hero/hero-home.svg", "Estudio Puntada"],
+  ["og/default-og.svg", "Estudio Puntada"],
 ];
 
 files.forEach(([relPath, label], i) => {

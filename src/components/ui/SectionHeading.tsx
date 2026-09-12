@@ -1,3 +1,5 @@
+import { StitchHeading } from "./StitchHeading";
+
 interface SectionHeadingProps {
   eyebrow?: string;
   title: string;
@@ -18,9 +20,11 @@ export function SectionHeading({
           {eyebrow}
         </p>
       )}
-      <h2 className="mt-2 font-heading text-3xl sm:text-4xl text-foreground">
-        {title}
-      </h2>
+      <StitchHeading
+        as="h2"
+        text={title}
+        className="mt-2 font-heading text-3xl sm:text-4xl text-foreground"
+      />
       {description && (
         <p className="mt-3 max-w-2xl text-foreground-muted">{description}</p>
       )}

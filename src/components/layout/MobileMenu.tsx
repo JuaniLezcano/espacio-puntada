@@ -69,7 +69,7 @@ export function MobileMenu({ links }: MobileMenuProps) {
             <div className="mt-auto">
               <WhatsAppCTA
                 phone={siteConfig.social.whatsapp ?? ""}
-                message="Hola! Quiero consultar sobre las clases de Espacio Puntada."
+                message="Hola! Quiero consultar sobre las clases de Estudio Puntada."
                 className="w-full"
               >
                 Escribinos por WhatsApp

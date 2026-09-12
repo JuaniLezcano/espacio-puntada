@@ -40,7 +40,7 @@ export function WeeklySchedule({ slots, interactive = false }: WeeklySchedulePro
             <a
               href={buildWhatsAppLink(
                 siteConfig.social.whatsapp,
-                `Hola! Quiero consultar por el horario del ${slot.day} de ${slot.time} en Espacio Puntada.`
+                `Hola! Quiero consultar por el horario del ${slot.day} de ${slot.time} en Estudio Puntada.`
               )}
               target="_blank"
               rel="noopener noreferrer"

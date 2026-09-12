@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { siteConfig } from "@/data/site-config";
 import { Container } from "./Container";
 import { MobileMenu } from "./MobileMenu";
@@ -15,7 +16,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-foreground/10 bg-background/95 backdrop-blur">
       <Container className="flex h-16 items-center justify-between">
-        <Link href="/" className="font-heading text-xl text-foreground">
+        <Link href="/" className="flex items-center gap-2 font-heading text-xl text-foreground">
+          <Image
+            src="/images/brand/icon.png"
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8"
+            priority
+          />
           {siteConfig.name}
         </Link>
 

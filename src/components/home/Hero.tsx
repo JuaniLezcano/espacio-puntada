@@ -2,6 +2,7 @@ import Image from "next/image";
 import { siteConfig } from "@/data/site-config";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/layout/Container";
+import { StitchHeading } from "@/components/ui/StitchHeading";
 
 export function Hero() {
   return (
@@ -11,9 +12,11 @@ export function Hero() {
           <p className="text-sm font-medium uppercase tracking-wide text-primary">
             {siteConfig.tagline}
           </p>
-          <h1 className="mt-3 font-heading text-4xl leading-tight text-foreground sm:text-5xl">
-            {siteConfig.name}
-          </h1>
+          <StitchHeading
+            as="h1"
+            text={siteConfig.name}
+            className="mt-3 font-heading text-4xl leading-tight text-foreground sm:text-5xl"
+          />
           <p className="mt-4 max-w-md text-foreground-muted">
             {siteConfig.description}
           </p>

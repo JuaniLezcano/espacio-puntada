@@ -35,13 +35,13 @@ export default function SobreNosotrosPage() {
           </div>
         </div>
 
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-background-alt p-10">
           <Image
-            src="/images/hero/hero-home.svg"
+            src="/images/brand/logo.png"
             alt={siteConfig.name}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
+            className="object-contain"
           />
         </div>
       </div>

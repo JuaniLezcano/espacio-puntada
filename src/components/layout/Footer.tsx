@@ -8,6 +8,9 @@ export function Footer() {
       <Container className="flex flex-col gap-6 py-10 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="font-heading text-lg text-foreground">{siteConfig.name}</p>
+          <p className="mt-1 text-xs uppercase tracking-wide text-primary">
+            {siteConfig.categoryTagline}
+          </p>
           <p className="mt-1 text-sm text-foreground-muted">{siteConfig.tagline}</p>
           <p className="mt-3 text-sm text-foreground-muted">
             {siteConfig.address.street}, {siteConfig.address.city}

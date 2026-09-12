@@ -2,21 +2,18 @@ import { Hero } from "@/components/home/Hero";
 import { RegularClasses } from "@/components/home/RegularClasses";
 import { FeaturedWorkshops } from "@/components/home/FeaturedWorkshops";
 import { FeaturedStudents } from "@/components/home/FeaturedStudents";
-import { Reveal } from "@/components/ui/Reveal";
+import { PinkedDivider } from "@/components/ui/PinkedDivider";
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <Reveal>
-        <RegularClasses />
-      </Reveal>
-      <Reveal>
-        <FeaturedWorkshops />
-      </Reveal>
-      <Reveal>
-        <FeaturedStudents />
-      </Reveal>
+      <PinkedDivider from="background-alt" to="background" />
+      <RegularClasses />
+      <PinkedDivider from="background" to="background-alt" />
+      <FeaturedWorkshops />
+      <PinkedDivider from="background-alt" to="background" />
+      <FeaturedStudents />
     </>
   );
 }
